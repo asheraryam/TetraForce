@@ -248,6 +248,7 @@ func respawn():
 		spritedir = last_safe_spritedir
 		set_health(MAX_HEALTH)
 		emit_signal("health_changed")
+		network.peer_call(self, "set_hurt_texture", [false])
 
 func check_for_death():
 	if health <= 0:
@@ -276,6 +277,8 @@ func loop_action_button():
 		hud.show_inventory()
 		state = "menu"
 		action_cooldown = 10
+	if Input.is_action_just_pressed("ESC"):
+		hud.show_esc_menu()
 
 func loop_interact():
 	if ray.is_colliding():

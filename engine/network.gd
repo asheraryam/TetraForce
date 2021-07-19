@@ -35,6 +35,18 @@ func _ready():
 	get_tree().connect("network_peer_disconnected", self, "_player_disconnected")
 	states.weapons = global.weapons
 
+func clean_session_data():
+	current_players = []
+	map_peers = []
+	player_list = {}
+	map_hosts = {}
+
+func complete():
+	tick.queue_free()
+	current_map.queue_free()
+	get_tree().set_network_peer(null)
+	clean_session_data()
+
 func initialize():
 	tick = Timer.new()
 	add_child(tick)
@@ -171,6 +183,13 @@ func set_state(path, properties):
 		global.emit_signal("debug_update")
 	else:
 		rpc_id(1, "_receive_state_change", path, properties)
+
+func add_to_state(state, value):
+	if !states.get(state).has(value):
+		states.get(state).append(value)
+		global.set(state, states.get(state))
+		rpc("_receive_state_array", state, states.get(state))
+		set_state(state, states.get(state))
 
 remote func _receive_state_change(nodepath, properties):
 	states[nodepath] = properties
